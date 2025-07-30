@@ -1,5 +1,3 @@
-top,false,cotton,blue,solid
-top,true,silk,gray,solid
-bottom,true,denim,black,solid
-shoes,false,leather,brown,solid
-jacket,true,wool,gray,plaid
+top,true,silk,blue,striped
+shoes,false,cotton,blue,striped
+shoes,false,rubber,black,solid

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <algorithm>
 #include <limits>
+#include <random>
 
 using namespace std;
 
@@ -70,9 +71,9 @@ Wardrobe loadDatabase(const string& filename) {
 
 void toLower(string& input) {
     for (int i = 0; i < input.length(); i++) {
-        if (!isalpha(input[i])) {
-            cerr << "Error: Only onter letters";
-        }
+        // if (!isalpha(input[i])) {
+        //     cerr << "Error: Only onter letters";
+        // }
         input[i] = tolower(input[i]);
     }
 }
@@ -196,7 +197,7 @@ void pushDatabase(const Wardrobe& src, const string& filename) {
                     << (item.isLong ? "true" : "false") << ","
                     << item.material << ","
                     << item.color << ","
-                    << item.pattern << "n";
+                    << item.pattern << "\n";
         }
     };
 
@@ -206,6 +207,33 @@ void pushDatabase(const Wardrobe& src, const string& filename) {
     writeVector(src.shoes);
 
     file.close();
+}
+
+void pickOutfit(Wardrobe& outfits, Wardrobe& dirty, bool jacket) {
+    Wardrobe picked;
+
+    auto pickNremove = [&](vector<ClothingItem>& from) -> ClothingItem {
+        if (from.empty()) throw runtime_error("You have no items of this clothing type to choose from.");
+        int index = rand() % from.size();
+        ClothingItem chosen = from[index];
+        from.erase(from.begin() + index);
+        return chosen;
+    };
+
+    int index = rand() % outfits.shoes.size();
+    ClothingItem chosenShoe = outfits.shoes[index];
+    picked.shoes.push_back(chosenShoe);
+    picked.bottoms.push_back(pickNremove(outfits.bottoms));
+    picked.tops.push_back(pickNremove(outfits.tops));
+    if (jacket) picked.jackets.push_back(pickNremove(outfits.jackets));
+
+    // Move to dirty wardrobe
+    dirty.bottoms.insert(dirty.bottoms.end(), picked.bottoms.begin(), picked.bottoms.end());
+    dirty.tops.insert(dirty.tops.end(), picked.tops.begin(), picked.tops.end());
+    dirty.jackets.insert(dirty.jackets.end(), picked.jackets.begin(), picked.jackets.end());
+
+    cout << "\n\nToday's Outfit: ";
+    printWardrobe(picked);
 }
 
 //future plans after basic functionality:

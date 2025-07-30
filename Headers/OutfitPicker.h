@@ -31,8 +31,10 @@ void updateVectors(Wardrobe& src, Wardrobe& dest, const vector<ClothingItem>& st
 void pushDatabase(const Wardrobe& src, const string& filename);
 void toLower(string& input);
 void updateWardrobes(Wardrobe& src, Wardrobe& dest, const vector<ClothingItem>& stay);
+void pickOutfit(Wardrobe& outfits, Wardrobe& dirty, bool jacket);
 vector<ClothingItem> getType(const Wardrobe& outfits, ClothingItem Item);
 Wardrobe loadDatabase(const string& filename);
 ClothingItem getUsersClothing();
+
 
 #endif

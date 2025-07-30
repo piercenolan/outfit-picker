@@ -64,8 +64,7 @@ void promptRemovals(Wardrobe& outfits) {
     printWardrobe(outfits);
 }
 
-void promptLaundry(Wardrobe& outfits) {
-    Wardrobe dirtyLaundry = loadDatabase("Other Files/dirtyLaundry.csv");
+void promptLaundry(Wardrobe& outfits, Wardrobe& dirtyLaundry) {
     vector<ClothingItem> unwashed;
 
     string action;
@@ -99,9 +98,30 @@ void promptLaundry(Wardrobe& outfits) {
     cout << "Good job! I have updated the outfit database to now include the clean clothes!";
 }
 
+void promptOutfit(Wardrobe& outfits, Wardrobe& dirty) {
+    string action;
+
+    cout << "\nDo you want an outfit suggestion?";
+    cin >> action;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    toLower(action);
+    if (action == "no") return;
+
+    cout << "   Do you need a jacket? (Yes/No): ";
+    cin >> action;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    toLower(action);
+    bool jacket;
+    
+    action == "yes" ? jacket = true : jacket = false;
+
+    pickOutfit(outfits, dirty, jacket);
+
+}
 int main() {
     // 1. Load clothing database from file
     Wardrobe outfits = loadDatabase("Other Files/outfits.csv");
+    Wardrobe dirty = loadDatabase("Other Files/dirtyLaundry.csv");
 
     //2. Welcome and print current database
     cout << "\n Welcome to the Outfit Picker!" << endl;
@@ -116,11 +136,15 @@ int main() {
     promptRemovals(outfits);
     
     //  c. Laundry done?
-    promptLaundry(outfits);
+    promptLaundry(outfits, dirty);
 
     //  d. Pick outfit?
+    promptOutfit(outfits, dirty);
 
     // 4. Save updated data to files
+    pushDatabase(outfits, "Other Files/outfits.csv");
+    pushDatabase(dirty, "Other Files/dirtyLaundry.csv");
 
+    cout << "\nAll databases updated. Have a great day!";
     return 0;
 }
