@@ -16,12 +16,23 @@ struct ClothingItem {
     string pattern; // e.g., "solid", "striped", "plaid"
 };
 
-vector<ClothingItem> loadClothingDatabase(const string& filename);
-ClothingItem getUsersClothing();
-void addClothing(vector<ClothingItem>& outfits);
-void printClothing(const vector<ClothingItem>& outfits);
-void removeClothing(vector<ClothingItem>& outfits);
-void updateDatabase(vector<ClothingItem>& src, vector<ClothingItem>& dest, const vector<ClothingItem>& stay);
+struct Wardrobe {
+    vector<ClothingItem> jackets;
+    vector<ClothingItem> tops;
+    vector<ClothingItem> bottoms;
+    vector<ClothingItem> shoes;
+};
 
+void addClothing(Wardrobe& outfits);
+void printClothing(const vector<ClothingItem>& outfits);
+void printWardrobe(const Wardrobe& outfits);
+void removeClothing(Wardrobe& outfits);
+void updateVectors(Wardrobe& src, Wardrobe& dest, const vector<ClothingItem>& stay);
+void pushDatabase(const Wardrobe& src, const string& filename);
+void toLower(string& input);
+void updateWardrobes(Wardrobe& src, Wardrobe& dest, const vector<ClothingItem>& stay);
+vector<ClothingItem> getType(const Wardrobe& outfits, ClothingItem Item);
+Wardrobe loadDatabase(const string& filename);
+ClothingItem getUsersClothing();
 
 #endif

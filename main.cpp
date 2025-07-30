@@ -23,84 +23,90 @@ Future Goals:
 #include <algorithm>
 #include <limits>
 #include "Headers/OutfitPicker.h"
-using namespace std;
+//using namespace std;
 
 
 /* Function handles prompting the user if they wish to add any clothe
 */
-void promptAdditions(vector<ClothingItem>& outfits) {
+void promptAdditions(Wardrobe& outfits) {
     string action;
     cout << "\n Do you have any clothes to add? (Yes/No): ";
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    if (action == "No" || action == "no") { return; }
-    while (action != "No" && action != "no") {
+    toLower(action);
+    if (action == "no")  return; 
+    while (action != "no") {
         addClothing(outfits);
         cout << "\n Do you want to add more clothes? (Yes/No): ";  //ensures user can add multiple items
         cin >> action;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        toLower(action);
     }
-    cout << "\n" << "Current clothing database:\n";
-    printClothing(outfits);
+    cout << "\n" << "Current Wardrobe:\n";
+    printWardrobe(outfits);
 }
 
-void promptRemovals(vector<ClothingItem>& outfits) {
+void promptRemovals(Wardrobe& outfits) {
     string action;
-    cout << "\n" << "\n Do you have any clothes to remove? (Yes/No): ";
+    cout << "\n Do you have any clothes to remove? (Yes/No): ";
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    if (action == "No" || action == "no") { return; }
-
-    while (action != "No" && action != "no") {
+    toLower(action);
+    if (action == "no") return; 
+    while (action != "no") {
         removeClothing(outfits);
         cout << "\n Do you want to remove more clothes? (Yes/No): ";  //ensures user can remove multiple items
         cin >> action;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        toLower(action);
     }
-    cout << "\n" << "Current clothing database:\n";
-    printClothing(outfits);
+    cout << "\nCurrent Wardrobe:\n";
+    printWardrobe(outfits);
 }
 
-void promptLaundry(vector<ClothingItem>& outfits) {
+void promptLaundry(Wardrobe& outfits) {
+    Wardrobe dirtyLaundry = loadDatabase("Other Files/dirtyLaundry.csv");
+    vector<ClothingItem> unwashed;
+
     string action;
     cout << " \nHave you done laundry? (Yes/No)";
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    if (action == "No" || action == "no") {
-        return;
-    }
+    toLower(action);
+
+    if (action == "no") return;
 
     cout << " \n Did you wash all dirty clothes? (Yes/No)";
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    vector<ClothingItem> unwashedClothes;
-    if (action == "No" || action == "no") {
+    toLower(action);
+    if (action == "no") {
         int numDirty = 0;
         cout << "\n How many clothes did you leave dirty? (#)";
         cin >> numDirty;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
     
         for (int i = 1; i <= numDirty; i++) {
             cout << "\nPlease describe item " << i << " that you didn't wash \n";
             ClothingItem dirty = getUsersClothing();
-            unwashedClothes.push_back(dirty);
+            unwashed.push_back(dirty);
         }
         cout << "\nHere are the clothes that are still dirty: \n";
-        printClothing(unwashedClothes);
+        printClothing(unwashed);
     }  
-    vector<ClothingItem> dirtyLaundry = loadClothingDatabase("Other Files/dirtyLaundry.csv");
-    updateDatabase(dirtyLaundry, outfits, unwashedClothes);
+    updateWardrobes(dirtyLaundry, outfits, unwashed);
     cout << "Good job! I have updated the outfit database to now include the clean clothes!";
 }
 
 int main() {
     // 1. Load clothing database from file
-    vector<ClothingItem> outfits = loadClothingDatabase("Other Files/outfits.csv");
+    Wardrobe outfits = loadDatabase("Other Files/outfits.csv");
 
     //2. Welcome and print current database
     cout << "\n Welcome to the Outfit Picker!" << endl;
-    cout << "\n" << "Current clothing database:\n";
-    printClothing(outfits);
+    cout << "\nCurrent clothing database:\n";
+    printWardrobe(outfits);
 
     // 3. Prompt user for:
     //  a. Add clothes?
@@ -112,20 +118,9 @@ int main() {
     //  c. Laundry done?
     promptLaundry(outfits);
 
-    //  d. Pick outfit
+    //  d. Pick outfit?
+
     // 4. Save updated data to files
-
-    //print or show current clothing database
-
-    //ask user if they need to add or remove any clothing items 
-
-    //ask user if they did laundry
-    //will return worn outfits to main database
-
-    //ask user if they want to pick an outfit
-
-    //On yes: will return a matching top, bottom, shoes, and jacket (if applicable) to user
-    //moves outfit to worn outfits database (except shoes, which stay in main database)
 
     return 0;
 }

@@ -1,4 +1,5 @@
-t-shirt,false,cotton,blue,solid
-jeans,true,denim,black,solid
+top,false,cotton,blue,solid
+top,true,silk,gray,solid
+bottom,true,denim,black,solid
 shoes,false,leather,brown,solid
 jacket,true,wool,gray,plaid
