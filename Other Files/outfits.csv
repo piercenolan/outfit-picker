@@ -1,3 +1,7 @@
+jacket,true,leather,brown and black,plain
+jacket,true,cotton,grey,solid
 top,true,silk,blue,striped
+bottom,true,denim,black,solid
+bottom,false,synthetic,cream,solid
 shoes,false,cotton,blue,striped
 shoes,false,rubber,black,solid
