@@ -16,21 +16,20 @@ Built as a personal project to demonstrate **C++ programming**, **file I/O**, an
 ---
 
 ## Project Structure
-
-OutfitPicker/
-│
-├── main.cpp # Main program entry point
-├── Sources/
-│ └── OutfitPicker.cpp # Core wardrobe and outfit logic
-├── Headers/
-│ └── OutfitPicker.h # Wardrobe data structures & function declarations
-├── Other Files/
-│ ├── outfits.csv # Current wardrobe inventory
-│ ├── dirtyLaundry.csv # Items currently dirty
-├── .vscode/ # VSCode debug/build settings
-│ ├── launch.json
-│ └── tasks.json
-└── README.md # Project documentation
+OutfitPicker/  
+│  
+├── main.cpp # Main program entry point  
+├── Sources/  
+│ └── OutfitPicker.cpp # Core wardrobe and outfit logic  
+├── Headers/  
+│ └── OutfitPicker.h # Wardrobe data structures & function declarations  
+├── Other Files/  
+│ ├── outfits.csv # Current wardrobe inventory  
+│ ├── dirtyLaundry.csv # Items currently dirty  
+├── .vscode/ # VSCode debug/build settings  
+│ ├── launch.json  
+│ └── tasks.json  
+└── README.md # Project documentation  
 
 ---
 
