@@ -30,9 +30,9 @@ void removeClothing(Wardrobe& outfits);
 void updateVectors(Wardrobe& src, Wardrobe& dest, const vector<ClothingItem>& stay);
 void pushDatabase(const Wardrobe& src, const string& filename);
 void toLower(string& input);
-void updateWardrobes(Wardrobe& src, Wardrobe& dest, const vector<ClothingItem>& stay);
+void updateWardrobes(Wardrobe& src, Wardrobe& dest, const Wardrobe& stay);
 void pickOutfit(Wardrobe& outfits, Wardrobe& dirty, bool jacket);
-vector<ClothingItem> getType(const Wardrobe& outfits, ClothingItem Item);
+vector<ClothingItem>& getType(Wardrobe& outfits, ClothingItem Item);
 Wardrobe loadDatabase(const string& filename);
 ClothingItem getUsersClothing();
 

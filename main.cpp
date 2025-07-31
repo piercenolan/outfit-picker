@@ -65,8 +65,7 @@ void promptRemovals(Wardrobe& outfits) {
 }
 
 void promptLaundry(Wardrobe& outfits, Wardrobe& dirtyLaundry) {
-    vector<ClothingItem> unwashed;
-
+    Wardrobe unwashed;
     string action;
     cout << " \nHave you done laundry? (Yes/No)";
     cin >> action;
@@ -89,10 +88,10 @@ void promptLaundry(Wardrobe& outfits, Wardrobe& dirtyLaundry) {
         for (int i = 1; i <= numDirty; i++) {
             cout << "\nPlease describe item " << i << " that you didn't wash \n";
             ClothingItem dirty = getUsersClothing();
-            unwashed.push_back(dirty);
+            getType(unwashed, dirty).push_back(dirty);
         }
         cout << "\nHere are the clothes that are still dirty: \n";
-        printClothing(unwashed);
+        printWardrobe(unwashed);
     }  
     updateWardrobes(dirtyLaundry, outfits, unwashed);
     cout << "Good job! I have updated the outfit database to now include the clean clothes!";

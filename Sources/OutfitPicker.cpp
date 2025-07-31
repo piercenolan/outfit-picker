@@ -174,14 +174,14 @@ void updateVectors(vector<ClothingItem>& src, vector<ClothingItem>& dest, const 
             dest.push_back(src[i]);
         } 
     }
-    src = stay;
+    if (!src.empty()) src = stay;
 }
 
-void updateWardrobes(Wardrobe& src, Wardrobe& dest, const vector<ClothingItem>& stay) {
-    updateVectors(src.shoes, dest.shoes, stay);
-    updateVectors(src.bottoms, dest.bottoms, stay);
-    updateVectors(src.tops, dest.tops, stay);
-    updateVectors(src.jackets, dest.jackets, stay);
+void updateWardrobes(Wardrobe& src, Wardrobe& dest, const Wardrobe& stay) {
+    updateVectors(src.shoes, dest.shoes, stay.shoes);
+    updateVectors(src.bottoms, dest.bottoms, stay.bottoms);
+    updateVectors(src.tops, dest.tops, stay.tops);
+    updateVectors(src.jackets, dest.jackets, stay.jackets);
 }
 
 void pushDatabase(const Wardrobe& src, const string& filename) {
