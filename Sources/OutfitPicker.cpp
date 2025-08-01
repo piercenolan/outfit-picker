@@ -294,6 +294,7 @@ void pushDatabase(const Wardrobe& src, const string& filename) {
         return;
     }
 
+    //Lambda to write all ClothingItems of a certain type into file
     auto writeVector = [&](const vector<ClothingItem>& items) {
         for (const auto& item : items) {
             file << item.type << ","
@@ -303,7 +304,7 @@ void pushDatabase(const Wardrobe& src, const string& filename) {
                     << item.pattern << "\n";
         }
     };
-
+    //Write all 4 vectors from wardrobe into the file
     writeVector(src.jackets);
     writeVector(src.tops);
     writeVector(src.bottoms);
@@ -323,6 +324,8 @@ void pushDatabase(const Wardrobe& src, const string& filename) {
 void pickOutfit(Wardrobe& outfits, Wardrobe& dirty, bool jacket) {
     Wardrobe picked;
 
+    //Lambda to randomly pick a clothing item from vector parameter
+    //      removes chosen item from the outfits database
     auto pickNremove = [&](vector<ClothingItem>& from) -> ClothingItem {
         if (from.empty()) throw runtime_error("You have no items of this clothing type to choose from.");
         int index = rand() % from.size();
@@ -330,13 +333,14 @@ void pickOutfit(Wardrobe& outfits, Wardrobe& dirty, bool jacket) {
         from.erase(from.begin() + index);
         return chosen;
     };
-
+    
+    //manually choose shoes, as shoes don't need washed after 1 wear
     int index = rand() % outfits.shoes.size();
     ClothingItem chosenShoe = outfits.shoes[index];
     picked.shoes.push_back(chosenShoe);
     picked.bottoms.push_back(pickNremove(outfits.bottoms));
     picked.tops.push_back(pickNremove(outfits.tops));
-    if (jacket) picked.jackets.push_back(pickNremove(outfits.jackets));
+    if (jacket) picked.jackets.push_back(pickNremove(outfits.jackets)); //only choose jacket if user said so
 
     // Move to dirty wardrobe
     dirty.bottoms.insert(dirty.bottoms.end(), picked.bottoms.begin(), picked.bottoms.end());
