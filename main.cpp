@@ -9,8 +9,11 @@
  *   - Randomly suggest outfits from available clothes.
  *   - Persist wardrobe data between runs using CSV files.
  *
- * Future Goals:
+ * Short-Term Future Goals:
+ *   - Create database of colors, materials, and patterns for user to pick from
  *   - Allow user style preferences to influence outfit selection.
+
+ * Long-Term Future Goals:
  *   - Support career-based outfit recommendations.
  *   - Integrate with a weather API for weather-appropriate suggestions.
  *   - Convert to a web or mobile interface.
@@ -73,6 +76,7 @@ void promptRemovals(Wardrobe& outfits) {
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     toLower(action);
+    checkBool(action);
     if (action == "no") return;         //Abort function to improve runtime
     while (action != "no") {        //ensures user can remove multiple items
         removeClothing(outfits);
@@ -80,6 +84,7 @@ void promptRemovals(Wardrobe& outfits) {
         cin >> action;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         toLower(action);
+        checkBool(action);
     }
     cout << "\nCurrent Wardrobe:\n";
     printWardrobe(outfits);
@@ -105,6 +110,7 @@ void promptLaundry(Wardrobe& outfits, Wardrobe& dirtyLaundry) {
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     toLower(action);
+    checkBool(action);
 
     if (action == "no") return;     //Abort function to improve runtime
 
@@ -112,6 +118,7 @@ void promptLaundry(Wardrobe& outfits, Wardrobe& dirtyLaundry) {
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     toLower(action);
+    checkBool(action);
     //User may not wash all dirty items each time they do laundry
     //this allows user to keep some items dirty if they didn't get washed
     if (action == "no") {
@@ -119,12 +126,26 @@ void promptLaundry(Wardrobe& outfits, Wardrobe& dirtyLaundry) {
         cout << "\n How many clothes did you leave dirty? (#)";
         cin >> numDirty;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        //Lambda checks if the clothing item is in the vector to avoid accidental typos
+        auto containsClothing = [](const vector<ClothingItem>& list, const ClothingItem& item) {
+                                return find(list.begin(), list.end(), item) != list.end();};
+
         //User describes each item they left dirty to ensure it doesn't become available to pick from
         for (int i = 1; i <= numDirty; i++) {
             cout << "\nPlease describe item " << i << " that you didn't wash \n";
             ClothingItem dirty = getUsersClothing();
-            getType(unwashed, dirty).push_back(dirty);
+
+            vector<ClothingItem>& dirtyList = getType(dirtyLaundry, dirty);
+            if (containsClothing(dirtyList, dirty)) {
+                getType(unwashed, dirty).push_back(dirty);
+            } 
+            else {
+                cerr << "That item is not in your dirty laundry list. Please try again.\n";
+                i--; // repeat this iteration
+            }
         }
+
         cout << "\nHere are the clothes that are still dirty: \n";      //allows user to ensure correctness of their answers
         printWardrobe(unwashed);
     }  
@@ -148,16 +169,18 @@ void promptLaundry(Wardrobe& outfits, Wardrobe& dirtyLaundry) {
 void promptOutfit(Wardrobe& outfits, Wardrobe& dirty) {
     string action;
 
-    cout << "\nDo you want an outfit suggestion?";
+    cout << "\nDo you want an outfit suggestion? (Yes/No): ";
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     toLower(action);
+    checkBool(action);
     if (action == "no") return;     //Aborts function to improve runtime
 
     cout << "   Do you need a jacket? (Yes/No): ";      //FUTURE PLANS: check weather API to suggest jacket or not
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     toLower(action);
+    checkBool(action);
     bool jacket;
     action == "yes" ? jacket = true : jacket = false;
 

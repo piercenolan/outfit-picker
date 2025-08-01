@@ -26,24 +26,6 @@
 
 using namespace std;
 
-/* operator==
- * Compares two ClothingItem objects for equality.
- *
- * Parameters:
- *   a - first ClothingItem.
- *   b - second ClothingItem.
- *
- * Returns:
- *   true if all fields match; false otherwise.
- */
-inline bool operator==(const ClothingItem& a, const ClothingItem& b) {
-    return a.type == b.type &&
-           a.isLong == b.isLong &&
-           a.material == b.material &&
-           a.color == b.color &&
-           a.pattern == b.pattern;
-}
-
 /* toLower
  * Converts all characters in a string to lowercase.
  *
@@ -55,11 +37,7 @@ inline bool operator==(const ClothingItem& a, const ClothingItem& b) {
  */
 void toLower(string& input) {
     for (int i = 0; i < input.length(); i++) {
-        /* TODO: Ensure user only enters correct input (only letters for sentences, only numbers for quantities)
-        if (!isalpha(input[i])) {
-            cerr << "Error: Only onter letters";
-        }
-        */
+        if (!isalpha(input[i]) && !isspace(input[i])) cerr << "Error: Remove all symbols from response, leaving only letters.\n";
         input[i] = tolower(input[i]);
     }
 }
@@ -83,14 +61,48 @@ void checkBool(string& input) {
     }
 }
 
+/* checkType
+ * Checks that user input is one of the 4 ClothingItem types
+ * 
+ * Parameters:
+ *   input  - reference to the string to check/modify.
+ * 
+ * Details:
+ *   - Changes the string in-place.
+ *   - Loops until user enters correct input 
+ */
 void checkType(string& input) {
-    while (input != "yes" && input != "no") {
-        cerr << "Error: Incorrect Input! Please enter either 'Yes' or 'No': ";
+    while (input != "jacket" && input != "top" && input != "bottom" && input != "shoes") {
+        cerr << "Error: Incorrect Input! Please enter either 'jacket', 'top', 'bottom', or 'shoes': ";
         cin >> input;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');        
         toLower(input);
     }    
 }
+
+/* checkInt
+ * Checks that user input is a decimal number
+ * 
+ * Parameters:
+ *   input  - reference to the input to check/modify.
+ * 
+ * Details:
+ *   - Loops until user enters correct input 
+ *
+void checkInt(string& input) {
+    while (true) {
+        // Check if every character is a digit and input is not empty
+        if (!input.empty() && all_of(input.begin(), input.end(), ::isdigit)) {
+            return; // Valid input — exit loop
+        }
+
+        cerr << "Error: Respond using only decimal numbers: ";
+        cin >> input;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+}
+    */
+
 /* loadDatabase
  * Loads wardrobe data from a CSV file into a Wardrobe object.
  *
@@ -160,15 +172,17 @@ ClothingItem getUsersClothing() {
     ClothingItem Item;
     string isLongInput;
     string converted;
-    cout << "Enter clothing type: (Jacket/Top/Bottom/Shoes)";
+    cout << "Enter clothing type (Jacket/Top/Bottom/Shoes): ";
     getline(cin, converted);
     toLower(converted);     //ensures formatting in vectors/.csv's are uniform
+    checkType(converted);   //ensures user entered one of the 4 clothing types
     Item.type = converted;
 
 
     cout << "Is it long-sleeved or long-pants? (Yes/No): ";
     getline(cin, isLongInput);
     toLower(isLongInput);
+    checkBool(isLongInput);
     Item.isLong = (isLongInput == "yes");       //ensures a boolean value for IsLong
 
     cout << "Enter clothing material: ";
@@ -267,9 +281,13 @@ void printWardrobe(const Wardrobe& outfits) {
 void removeClothing(Wardrobe& outfits) {
     ClothingItem itemToRemove = getUsersClothing();
     vector<ClothingItem>& type = getType(outfits, itemToRemove);
+    int og_sz = type.size();
     type.erase(remove_if(type.begin(), type.end(),
                   [&itemToRemove](const ClothingItem& item) {
                       return item == itemToRemove;}), type.end());
+    
+    if (type.size() == og_sz) cout << "Error: No matching item found. Please check your input and try again.";
+    else cout << "Item removed successfully!";
 }
 
 /* updateVectors

@@ -24,12 +24,28 @@ struct Wardrobe {
 };
 
 // Comparison operator
-inline bool operator==(const ClothingItem& a, const ClothingItem& b);
-
+/* operator==
+ * Compares two ClothingItem objects for equality.
+ *
+ * Parameters:
+ *   a - first ClothingItem.
+ *   b - second ClothingItem.
+ *
+ * Returns:
+ *   true if all fields match; false otherwise.
+ */
+inline bool operator==(const ClothingItem& a, const ClothingItem& b) {
+    return a.type == b.type &&
+           a.isLong == b.isLong &&
+           a.material == b.material &&
+           a.color == b.color &&
+           a.pattern == b.pattern;
+}
 // Utility functions
 void toLower(string& input);
 void checkBool(string& input);
 void checkType(string& input);
+//void checkInt(string& input);
 vector<ClothingItem>& getType(Wardrobe& outfits, ClothingItem Item);
 
 // Core functionality
