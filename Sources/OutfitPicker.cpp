@@ -1,4 +1,22 @@
-// OutfitPicker.cpp
+/* Nolan Pierce - Outfit Picker Implementation
+ *
+ * Overview:
+ *   Implements all wardrobe and outfit management functions for the Outfit Picker program.
+ *   Handles reading and writing clothing data, adding/removing items, tracking laundry,
+ *   and generating random outfit suggestions.
+ *
+ * Features:
+ *   - Load wardrobe data from CSV files.
+ *   - Add and remove clothing items.
+ *   - Track clean and dirty clothes.
+ *   - Save updated wardrobe data.
+ *   - Suggest outfits randomly, with optional jacket.
+ *
+ * Future Goals:
+ *   - Integrate weather-based outfit suggestions.
+ *   - Add user style preference filtering.
+ *   - Convert to web or mobile interface.
+ */
 #include "../Headers/OutfitPicker.h"
 #include <iostream>
 #include <fstream>
@@ -8,7 +26,16 @@
 
 using namespace std;
 
-
+/* operator==
+ * Compares two ClothingItem objects for equality.
+ *
+ * Parameters:
+ *   a - first ClothingItem.
+ *   b - second ClothingItem.
+ *
+ * Returns:
+ *   true if all fields match; false otherwise.
+ */
 inline bool operator==(const ClothingItem& a, const ClothingItem& b) {
     return a.type == b.type &&
            a.isLong == b.isLong &&
@@ -17,13 +44,37 @@ inline bool operator==(const ClothingItem& a, const ClothingItem& b) {
            a.pattern == b.pattern;
 }
 
-/* Load from files:
-    Open file using ifstream
-    Loop through each line
-    Parse line into ClothingItem struct
-    Add it to vector
-*/
+/* toLower
+ * Converts all characters in a string to lowercase.
+ *
+ * Parameters:
+ *   input - reference to the string to modify.
+ *
+ * Details:
+ *   - Changes the string in-place.
+ */
+void toLower(string& input) {
+    for (int i = 0; i < input.length(); i++) {
+        /* TODO: Ensure user only enters correct input (only letters for sentences, only numbers for quantities)
+        if (!isalpha(input[i])) {
+            cerr << "Error: Only onter letters";
+        }
+        */
+        input[i] = tolower(input[i]);
+    }
+}
+
+/* loadDatabase
+ * Loads wardrobe data from a CSV file into a Wardrobe object.
+ *
+ * Parameters:
+ *   filename - path to the CSV file.
+ *
+ * Returns:
+ *   Wardrobe populated with clothing items from the file.
+ */
 Wardrobe loadDatabase(const string& filename) {   
+    //Var Initialization
     Wardrobe clothingDatabase;
     ifstream file(filename);
     string line;
@@ -53,13 +104,15 @@ Wardrobe loadDatabase(const string& filename) {
         line.erase(0, pos + 1);
 
         item.pattern = line; // Remaining part is pattern
-
+        
+        //Add ClothingItem to corresponding vector
         if (item.type == "top") tops.push_back(item);
         else if (item.type == "bottom") bottoms.push_back(item);
         else if (item.type == "shoes") shoes.push_back(item);
         else if (item.type == "jacket") jackets.push_back(item);
     }
 
+    //Update overall wardrobe to include corresponding vectors for each type
     clothingDatabase.shoes = shoes;
     clothingDatabase.bottoms = bottoms;
     clothingDatabase.tops = tops;
@@ -69,29 +122,27 @@ Wardrobe loadDatabase(const string& filename) {
     return clothingDatabase;
 }
 
-void toLower(string& input) {
-    for (int i = 0; i < input.length(); i++) {
-        // if (!isalpha(input[i])) {
-        //     cerr << "Error: Only onter letters";
-        // }
-        input[i] = tolower(input[i]);
-    }
-}
-
+/* getUsersClothing
+ * Prompts the user for details about a clothing item.
+ *
+ * Returns:
+ *   ClothingItem filled with user-provided data.
+ */
 ClothingItem getUsersClothing() {
+    //Var initialization
     ClothingItem Item;
     string isLongInput;
     string converted;
     cout << "Enter clothing type: (Jacket/Top/Bottom/Shoes)";
-    getline(cin, converted);  // No need to ignore here
-    toLower(converted);
+    getline(cin, converted);
+    toLower(converted);     //ensures formatting in vectors/.csv's are uniform
     Item.type = converted;
 
 
     cout << "Is it long-sleeved or long-pants? (Yes/No): ";
     getline(cin, isLongInput);
     toLower(isLongInput);
-    Item.isLong = (isLongInput == "yes");
+    Item.isLong = (isLongInput == "yes");       //ensures a boolean value for IsLong
 
     cout << "Enter clothing material: ";
     getline(cin, converted);
@@ -111,6 +162,19 @@ ClothingItem getUsersClothing() {
     return Item;
 }
 
+/* getType
+ * Returns the vector in a Wardrobe corresponding to a clothing item’s type.
+ *
+ * Parameters:
+ *   outfits - wardrobe to search.
+ *   Item    - clothing item whose type determines the returned vector.
+ *
+ * Returns:
+ *   Reference to the correct vector in outfits.
+ *
+ * Throws:
+ *   runtime_error if the clothing type is unknown.
+ */
 vector<ClothingItem>& getType(Wardrobe& outfits, ClothingItem Item) {
     if (Item.type == "jacket") return outfits.jackets;
     else if (Item.type == "top") return outfits.tops;
@@ -120,17 +184,23 @@ vector<ClothingItem>& getType(Wardrobe& outfits, ClothingItem Item) {
     throw runtime_error("Unknown clothing type: " + Item.type);
 }
 
-/*Prompts user for all aspects of the clothing item they wish to add
- * Adds to vector containing all items in wardrobe
-*/
+/* addClothing
+ * Prompts user for a clothing item and adds it to the wardrobe.
+ *
+ * Parameters:
+ *   outfits - wardrobe to update.
+ */
 void addClothing(Wardrobe& outfits) {
     ClothingItem newItem = getUsersClothing();
     getType(outfits, newItem).push_back(newItem);
 }
 
-/*Prints the contents of the clothing database vector in a visually appealing way
- * allows easy browsing from user
-*/
+/* printClothing
+ * Displays a list of clothing items in a readable format.
+ *
+ * Parameters:
+ *   clothes - vector of ClothingItem objects to display.
+ */
 void printClothing(const vector<ClothingItem>& clothes) {
     for (const auto& item : clothes) {
         cout << "       Type: " << item.type 
@@ -141,8 +211,12 @@ void printClothing(const vector<ClothingItem>& clothes) {
     }
 }
 
-/* Prints contents of entire wardrobe for user
-*/
+/* printWardrobe
+ * Displays all clothing items in a wardrobe.
+ *
+ * Parameters:
+ *   outfits - wardrobe to display.
+ */
 void printWardrobe(const Wardrobe& outfits) {
     cout << "\nJackets: \n";
     printClothing(outfits.jackets);
@@ -157,8 +231,12 @@ void printWardrobe(const Wardrobe& outfits) {
     printClothing(outfits.shoes);
 }
 
-/* Allows user to remove any clothing from database vector by prompting for all aspects of items
-*/
+/* removeClothing
+ * Prompts user for a clothing item and removes it from the wardrobe.
+ *
+ * Parameters:
+ *   outfits - wardrobe to update.
+ */
 void removeClothing(Wardrobe& outfits) {
     ClothingItem itemToRemove = getUsersClothing();
     vector<ClothingItem>& type = getType(outfits, itemToRemove);
@@ -167,16 +245,34 @@ void removeClothing(Wardrobe& outfits) {
                       return item == itemToRemove;}), type.end());
 }
 
-
+/* updateVectors
+ * Moves items from one vector to another, excluding those that should stay.
+ *
+ * Parameters:
+ *   src  - source vector.
+ *   dest - destination vector.
+ *   stay - items to remain in source.
+ */
 void updateVectors(vector<ClothingItem>& src, vector<ClothingItem>& dest, const vector<ClothingItem>& stay) {
     for (int i = 0; i < src.size(); i++) {
+        //Add elements from src to dest, unless they are in 'stay'
         if (find(stay.begin(), stay.end(), src[i]) == stay.end()) {
             dest.push_back(src[i]);
         } 
     }
+    //As long as src wasn't an empty vector (i.e. dirtyLaundry.csv was empty),
+    //src vector becomes the stay vector, ensuring items meant to stay, remain
     if (!src.empty()) src = stay;
 }
 
+/* updateWardrobes
+ * Moves items between two wardrobes, excluding items that should stay.
+ *
+ * Parameters:
+ *   src  - source wardrobe.
+ *   dest - destination wardrobe.
+ *   stay - items to remain in source.
+ */
 void updateWardrobes(Wardrobe& src, Wardrobe& dest, const Wardrobe& stay) {
     updateVectors(src.shoes, dest.shoes, stay.shoes);
     updateVectors(src.bottoms, dest.bottoms, stay.bottoms);
@@ -184,6 +280,13 @@ void updateWardrobes(Wardrobe& src, Wardrobe& dest, const Wardrobe& stay) {
     updateVectors(src.jackets, dest.jackets, stay.jackets);
 }
 
+/* pushDatabase
+ * Saves wardrobe data to a CSV file.
+ *
+ * Parameters:
+ *   src      - wardrobe to save.
+ *   filename - path to CSV file.
+ */
 void pushDatabase(const Wardrobe& src, const string& filename) {
     ofstream file(filename);
     if (!file.is_open()) {
@@ -209,6 +312,14 @@ void pushDatabase(const Wardrobe& src, const string& filename) {
     file.close();
 }
 
+/* pickOutfit
+ * Generates and displays a random outfit from the wardrobe.
+ *
+ * Parameters:
+ *   outfits - wardrobe to pick from.
+ *   dirty   - wardrobe to move worn clothes into.
+ *   jacket  - whether to include a jacket in the outfit.
+ */
 void pickOutfit(Wardrobe& outfits, Wardrobe& dirty, bool jacket) {
     Wardrobe picked;
 
@@ -235,11 +346,3 @@ void pickOutfit(Wardrobe& outfits, Wardrobe& dirty, bool jacket) {
     cout << "\n\nToday's Outfit: ";
     printWardrobe(picked);
 }
-
-//future plans after basic functionality:
-    //- connect to a weather API to suggest outfits based on the weather
-    //- allow user to set preferences for outfits (e.g., formal, casual, etc.)
-    //- allow user to input work field and suggest outfits based on that
-    //- turn program into website or app for easier access
-    //- allow user to snap picture of new clothing item and add it to the database
-

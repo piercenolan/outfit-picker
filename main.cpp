@@ -1,21 +1,20 @@
 /* Nolan Pierce - Custom Outfit Organizer
-
-This project contains code for a command-line outfit organizer program.
-
-It allows the user to add and remove clothes that may be in their wardrobe.
-
-It tracks which clothes the user has, which ones have been worn recently, and 
-which are dirty and need washed before wearing again.
-
-Starting functionality includes random clothing pairings from the wardrobe.
-
-Future Goals:
-- allow user to provide input on their style
-    - updating algorithm to choose outfits they enjoy
-- Allow user to input career field, impacting outfit recommendations
-- Connect to a weather API to give real-time outfits based on weather
-- Convert to web or mobile interface
-*/
+ *
+ * Overview:
+ *   Command-line tool for managing a personal wardrobe and generating outfit suggestions.
+ *
+ * Features:
+ *   - Add or remove clothing items from the wardrobe.
+ *   - Track which items are clean, recently worn, or dirty.
+ *   - Randomly suggest outfits from available clothes.
+ *   - Persist wardrobe data between runs using CSV files.
+ *
+ * Future Goals:
+ *   - Allow user style preferences to influence outfit selection.
+ *   - Support career-based outfit recommendations.
+ *   - Integrate with a weather API for weather-appropriate suggestions.
+ *   - Convert to a web or mobile interface.
+ */
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -23,21 +22,30 @@ Future Goals:
 #include <algorithm>
 #include <limits>
 #include "Headers/OutfitPicker.h"
-//using namespace std;
 
 
-/* Function handles prompting the user if they wish to add any clothe
-*/
+/* promptAdditions
+ * Prompts the user to add any new clothing items to their wardrobe.
+ *
+ * Parameters:
+ *   outfits - reference to the Wardrobe object containing all available clothes.
+ *
+ * Details:
+ *   - Asks the user if they have new clothes to add.
+ *   - Allows multiple additions until the user responds "No".
+ *   - Converts all input to lowercase for case-insensitive matching.
+ *   - Prints the updated wardrobe when finished.
+ */
 void promptAdditions(Wardrobe& outfits) {
-    string action;
+    string action;      //re-usable variable to store user input
     cout << "\n Do you have any clothes to add? (Yes/No): ";
     cin >> action;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');        //throws away any additional input including newline 
     toLower(action);
-    if (action == "no")  return; 
-    while (action != "no") {
+    if (action == "no")  return;        //Abort function to improve runtime
+    while (action != "no") {        //ensures user can add multiple items
         addClothing(outfits);
-        cout << "\n Do you want to add more clothes? (Yes/No): ";  //ensures user can add multiple items
+        cout << "\n Do you want to add more clothes? (Yes/No): ";  
         cin >> action;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         toLower(action);
@@ -46,16 +54,28 @@ void promptAdditions(Wardrobe& outfits) {
     printWardrobe(outfits);
 }
 
+/* promptRemovals
+ * Prompts the user to remove clothing items from their wardrobe.
+ *
+ * Parameters:
+ *   outfits - reference to the Wardrobe object containing all available clothes.
+ *
+ * Details:
+ *   - Asks the user if they have clothes to remove.
+ *   - Allows multiple removals until the user responds "No".
+ *   - Converts all input to lowercase for case-insensitive matching.
+ *   - Prints the updated wardrobe when finished.
+ */
 void promptRemovals(Wardrobe& outfits) {
     string action;
     cout << "\n Do you have any clothes to remove? (Yes/No): ";
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     toLower(action);
-    if (action == "no") return; 
-    while (action != "no") {
+    if (action == "no") return;         //Abort function to improve runtime
+    while (action != "no") {        //ensures user can remove multiple items
         removeClothing(outfits);
-        cout << "\n Do you want to remove more clothes? (Yes/No): ";  //ensures user can remove multiple items
+        cout << "\n Do you want to remove more clothes? (Yes/No): ";  
         cin >> action;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         toLower(action);
@@ -64,6 +84,19 @@ void promptRemovals(Wardrobe& outfits) {
     printWardrobe(outfits);
 }
 
+/* promptLaundry
+ * Prompts the user about doing laundry and updates wardrobe availability.
+ *
+ * Parameters:
+ *   outfits      - reference to the Wardrobe object containing clean clothes.
+ *   dirtyLaundry - reference to the Wardrobe object containing dirty clothes.
+ *
+ * Details:
+ *   - If laundry is done, asks whether all dirty clothes were washed.
+ *   - If not all clothes were washed, the user specifies which remain dirty.
+ *   - Updates wardrobe and dirty laundry lists accordingly.
+ *   - Persists changes for future outfit selections.
+ */
 void promptLaundry(Wardrobe& outfits, Wardrobe& dirtyLaundry) {
     Wardrobe unwashed;
     string action;
@@ -72,31 +105,45 @@ void promptLaundry(Wardrobe& outfits, Wardrobe& dirtyLaundry) {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     toLower(action);
 
-    if (action == "no") return;
+    if (action == "no") return;     //Abort function to improve runtime
 
     cout << " \n Did you wash all dirty clothes? (Yes/No)";
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     toLower(action);
+    //User may not wash all dirty items each time they do laundry
+    //this allows user to keep some items dirty if they didn't get washed
     if (action == "no") {
         int numDirty = 0;
         cout << "\n How many clothes did you leave dirty? (#)";
         cin >> numDirty;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-    
+        //User describes each item they left dirty to ensure it doesn't become available to pick from
         for (int i = 1; i <= numDirty; i++) {
             cout << "\nPlease describe item " << i << " that you didn't wash \n";
             ClothingItem dirty = getUsersClothing();
             getType(unwashed, dirty).push_back(dirty);
         }
-        cout << "\nHere are the clothes that are still dirty: \n";
+        cout << "\nHere are the clothes that are still dirty: \n";      //allows user to ensure correctness of their answers
         printWardrobe(unwashed);
     }  
-    updateWardrobes(dirtyLaundry, outfits, unwashed);
+    updateWardrobes(dirtyLaundry, outfits, unwashed);       //Saves changes so outfit picked can include washed items
     cout << "Good job! I have updated the outfit database to now include the clean clothes!";
 }
 
+/* promptOutfit
+ * Prompts the user for an outfit suggestion and updates clothing availability.
+ *
+ * Parameters:
+ *   outfits - reference to the Wardrobe object containing clean clothes.
+ *   dirty   - reference to the Wardrobe object containing dirty clothes.
+ *
+ * Details:
+ *   - Asks whether the user wants an outfit suggestion.
+ *   - If yes, asks whether to include a jacket.
+ *   - Picks a random outfit (and jacket if desired).
+ *   - Moves selected clothes to dirty laundry.
+ */
 void promptOutfit(Wardrobe& outfits, Wardrobe& dirty) {
     string action;
 
@@ -104,19 +151,20 @@ void promptOutfit(Wardrobe& outfits, Wardrobe& dirty) {
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     toLower(action);
-    if (action == "no") return;
+    if (action == "no") return;     //Aborts function to improve runtime
 
-    cout << "   Do you need a jacket? (Yes/No): ";
+    cout << "   Do you need a jacket? (Yes/No): ";      //FUTURE PLANS: check weather API to suggest jacket or not
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     toLower(action);
     bool jacket;
-    
     action == "yes" ? jacket = true : jacket = false;
 
     pickOutfit(outfits, dirty, jacket);
-
 }
+
+
+
 int main() {
     // 1. Load clothing database from file
     Wardrobe outfits = loadDatabase("Other Files/outfits.csv");
