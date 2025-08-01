@@ -42,6 +42,7 @@ void promptAdditions(Wardrobe& outfits) {
     cin >> action;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');        //throws away any additional input including newline 
     toLower(action);
+    checkBool(action);
     if (action == "no")  return;        //Abort function to improve runtime
     while (action != "no") {        //ensures user can add multiple items
         addClothing(outfits);

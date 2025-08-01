@@ -28,6 +28,8 @@ inline bool operator==(const ClothingItem& a, const ClothingItem& b);
 
 // Utility functions
 void toLower(string& input);
+void checkBool(string& input);
+void checkType(string& input);
 vector<ClothingItem>& getType(Wardrobe& outfits, ClothingItem Item);
 
 // Core functionality

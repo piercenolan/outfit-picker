@@ -64,6 +64,33 @@ void toLower(string& input) {
     }
 }
 
+/* checkBool
+ * Checks that user input is "yes" or "no"
+ * 
+ * Parameters:
+ *   input  - reference to the string to check/modify.
+ * 
+ * Details:
+ *   - Changes the string in-place.
+ *   - Loops until user enters correct input 
+ */
+void checkBool(string& input) {
+    while (input != "yes" && input != "no") {
+        cerr << "Error: Incorrect Input! Please enter either 'Yes' or 'No': ";
+        cin >> input;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');        
+        toLower(input);
+    }
+}
+
+void checkType(string& input) {
+    while (input != "yes" && input != "no") {
+        cerr << "Error: Incorrect Input! Please enter either 'Yes' or 'No': ";
+        cin >> input;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');        
+        toLower(input);
+    }    
+}
 /* loadDatabase
  * Loads wardrobe data from a CSV file into a Wardrobe object.
  *
